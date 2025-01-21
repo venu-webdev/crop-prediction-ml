@@ -8,6 +8,13 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsi
 import { Upload, ActivitySquare, BarChart3, FileText } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
+interface ModelMetrics {
+    accuracy: number;
+    precision: number;
+    recall: number;
+    f1Score: number;
+}
+
 const TrainingPage = () => {
     const [ref, inView] = useInView({
         triggerOnce: true,
@@ -16,7 +23,7 @@ const TrainingPage = () => {
 
     const [trainingProgress, setTrainingProgress] = useState(0);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
-    const [modelMetrics, setModelMetrics] = useState({
+    const [modelMetrics, setModelMetrics] = useState<ModelMetrics>({
         accuracy: 0,
         precision: 0,
         recall: 0,
@@ -32,38 +39,27 @@ const TrainingPage = () => {
         { epoch: 5, accuracy: 0.92, loss: 0.18 },
     ];
 
-    interface ModelMetrics {
-        accuracy: number;
-        precision: number;
-        recall: number;
-        f1Score: number;
-    }
+    const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            setSelectedFile(file);
 
-    interface FileEvent extends React.ChangeEvent<HTMLInputElement> {
-        target: HTMLInputElement & {
-            files: FileList;
-        };
-    }
-
-    const handleFileUpload = (event: FileEvent): void => {
-        const file: File = event.target.files[0];
-        setSelectedFile(file);
-
-        // Simulate training progress
-        let progress: number = 0;
-        const interval = window.setInterval(() => {
-            progress += 5;
-            setTrainingProgress(progress);
-            if (progress >= 100) {
-                clearInterval(interval);
-                setModelMetrics({
-                    accuracy: 0.92,
-                    precision: 0.89,
-                    recall: 0.88,
-                    f1Score: 0.90,
-                });
-            }
-        }, 500);
+            // Simulate training progress
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 5;
+                setTrainingProgress(progress);
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    setModelMetrics({
+                        accuracy: 0.92,
+                        precision: 0.89,
+                        recall: 0.88,
+                        f1Score: 0.90,
+                    });
+                }
+            }, 500);
+        }
     };
 
     return (
